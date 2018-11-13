@@ -9,10 +9,12 @@ import {
   Text,
   SearchField,
   Icon,
+  Spinner,
 } from 'gestalt';
 import { Link } from 'react-router-dom';
-import Strapi from 'strapi-sdk-javascript/build/main';
 
+/* strapi configuration */
+import Strapi from 'strapi-sdk-javascript/build/main';
 const apiURL = process.env.API_URL || 'http://localhost:1337';
 const strapi = new Strapi(apiURL);
 
@@ -20,6 +22,7 @@ class App extends Component {
   state = {
     brands: [],
     searchTerm: '',
+    loadingBrands: true,
   };
 
   async componentDidMount() {
@@ -29,6 +32,7 @@ class App extends Component {
           query: /* GraphQL */ `
             query {
               brands {
+                _id
                 name
                 description
                 image {
@@ -39,9 +43,10 @@ class App extends Component {
           `,
         },
       });
-      this.setState({ brands: response.data.brands });
+      this.setState({ brands: response.data.brands, loadingBrands: false });
     } catch (err) {
       console.error(err);
+      this.setState({ loadingBrands: false });
     }
   }
 
@@ -49,8 +54,17 @@ class App extends Component {
     this.setState({ searchTerm: value });
   };
 
+  filteredBrands = ({ searchTerm, brands }) => {
+    return brands.filter(brand => {
+      return (
+        brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        brand.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+  };
+
   render() {
-    const { brands, searchTerm } = this.state;
+    const { searchTerm, loadingBrands } = this.state;
 
     return (
       <Container>
@@ -60,6 +74,7 @@ class App extends Component {
             id="searchField"
             accessibilityLabel="Brands Search"
             onChange={this.handleChange}
+            value={searchTerm}
             placeholder="Search Brands"
           />
           <Box margin={3}>
@@ -91,7 +106,7 @@ class App extends Component {
           display="flex"
           justifyContent="around"
         >
-          {brands.map(brand => (
+          {this.filteredBrands(this.state).map(brand => (
             <Box paddingY={4} margin={2} width={200} key={brand.name}>
               <Card
                 image={
@@ -117,13 +132,14 @@ class App extends Component {
                   </Text>
                   <Text>{brand.description}</Text>
                   <Text bold size="xl">
-                    <Link to={`/${brand.name}`}>See Brews</Link>
+                    <Link to={`/${brand._id}`}>See Brews</Link>
                   </Text>
                 </Box>
               </Card>
             </Box>
           ))}
         </Box>
+        <Spinner show={loadingBrands} accessibilityLabel="Loading Spinner" />
       </Container>
     );
   }
