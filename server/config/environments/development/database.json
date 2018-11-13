@@ -1,0 +1,21 @@
+{
+  "defaultConnection": "default",
+  "connections": {
+    "default": {
+      "connector": "strapi-hook-mongoose",
+      "settings": {
+        "client": "mongo",
+        "host": "ds239368.mlab.com",
+        "srv": false,
+        "port": "39368",
+        "database": "flashcard",
+        "username": "evertonfrozza",
+        "password": "evertonfrozza1"
+      },
+      "options": {
+        "authenticationDatabase": "flashcard",
+        "ssl": false
+      }
+    }
+  }
+}
