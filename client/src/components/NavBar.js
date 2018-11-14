@@ -25,7 +25,7 @@ const NavBar = () => (
     <NavLink activeClassName="active" exact to="/">
       <Box display="flex" alignItems="center">
         <Heading size="xs" color="orange">
-          FlashCards
+          Brew Shopp
         </Heading>
       </Box>
     </NavLink>
